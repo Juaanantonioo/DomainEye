@@ -15,7 +15,7 @@ import whois
 import dns.resolver
 import dnstwist  # si luego lo usáis para generar dominios
 
-from genera_dominios import generate_candidates
+from genera_dominios import generate_registered_candidates
 from scoring import score_domain
 
 # Timeout global de sockets (WHOIS, DNS, HTTP)
@@ -402,7 +402,7 @@ def main():
     brand = base_domain.split(".")[0]
 
     print(f"[+] Generando candidatos para: {base_domain}")
-    candidates = generate_candidates(base_domain)
+    candidates = generate_registered_candidates(base_domain)
     print(f"[+] Se han generado {len(candidates)} dominios candidatos.")
 
     print("[+] Analizando dominio base para extraer favicon y señales de marca...")

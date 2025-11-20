@@ -3,7 +3,7 @@ import dnstwist
 
 COMMON_TLDS = [".com", ".net", ".org", ".io", ".shop", ".online"]
 
-def generate_candidates(base_domain: str):
+def generate_registered_candidates(base_domain: str):
     name, _, tld = base_domain.partition(".")
     candidates = set()
     
@@ -46,3 +46,4 @@ def generate_candidates(base_domain: str):
 
     return sorted(candidates)
 
+print(generate_registered_candidates("ewala.es"))

@@ -41,7 +41,8 @@ def generate_candidates(base_domain: str):
     candidates.discard(base_domain)
 
     import dnstwist_domain_generator as dns_dg
-    for candidate in dns_dg.get_similar_registered_domains(base_domain):
+    for candidate in dns_dg.get_similar_registered_domains_sync_wrapper(base_domain):
         candidates.add(candidate)
 
     return sorted(candidates)
+

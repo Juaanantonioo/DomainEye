@@ -30,7 +30,7 @@ def generate_registered_candidates(base_domain: str):
 
     if len(candidates) <= 5:
         return sorted(candidates)
-    return sorted(candidates[0:5])
+    return sorted(list(candidates)[0:5])
 
 def generate_all_candidates(base_domain: str):
     name, _, tld = base_domain.partition(".")

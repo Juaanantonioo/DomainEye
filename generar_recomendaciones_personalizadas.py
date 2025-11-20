@@ -149,7 +149,7 @@ def generar_recomendaciones_html(params: RecomendacionesParams) -> str:
             {html_generales}
         </ul>
 
-        <h2>Recomendaciones Específicas para el dominio más problemático</h2>
+        <h2>Recomendaciones Específicas para el {params.domain}</h2>
         <ul>
             {html_especificas}
         </ul>
@@ -165,4 +165,6 @@ def generar_recomendaciones_html(params: RecomendacionesParams) -> str:
 if __name__ == "__main__":
     params = RecomendacionesParams([12, 20, 32, 12, 15, 17], [datetime.now()], ["España", "España", "España", "Italia", "Italia", "Portugal"], "evvala.es", 30, datetime.now(), "España", "Alto riesgo: revisar contenido y considerar denuncia al registrador/hosting.", 100, "ewala.es")
     res = generar_recomendaciones(params)
+    res = generar_recomendaciones_html(params)
     print(res)
+

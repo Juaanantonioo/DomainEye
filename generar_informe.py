@@ -326,18 +326,24 @@ def build_rows(base_domain: str, candidates: list, base_http_data: dict):
     all_scores = []
 
     brand = base_domain.split(".")[0].lower()
+
+    print("normalize_brand_domain")
     base_norm = normalize_brand_domain(base_domain)
 
     for domain in candidates:
         # 1) DNS
+        print("get_dns_data")
         dns_data = get_dns_data(domain)
 
         if dns_data.get("ip") or dns_data.get("mx_records"):
+            print("get_whois_data")
             whois_data = get_whois_data(domain)
         else:
+            print("empty_whois_data")
             whois_data = empty_whois_data()
 
         # 2) HTTP / contenido
+        print("get_http_data")
         http_data = get_http_data(domain, brand)
 
         # Dominio defensivo: redirige al mismo dominio de marca

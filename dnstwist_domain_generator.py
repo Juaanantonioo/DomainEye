@@ -41,8 +41,12 @@ async def async_get_similar_registered_domains(domain: str) -> list[str]:
     # 2. Configuración asíncrona
     # Inicializamos el resolver una sola vez
     resolver = aiodns.DNSResolver()
+
+    # TODO: No limitarlo
+    candidates = candidates[:300]
     
     # Creamos una lista de TAREAS
+    print("candidates len:", len(candidates))
     tasks = [async_is_registered(resolver, candidate) for candidate in candidates]
 
     # 3. Ejecutar TAREAS concurrentemente

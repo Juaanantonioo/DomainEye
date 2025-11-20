@@ -1,19 +1,24 @@
 from datetime import datetime
 
-def build_domain_report_html(domain : str, tables_html: str, score: float, recommend_div : str) -> str:
+def build_domain_report_html(domain: str, tables_html: str, score: float, recommend_div: str) -> str:
     """
     Build the full DominAI report HTML.
 
     Parameters
     ----------
+    domain : str
+        Main domain analysed.
+
     tables_html : str
         Raw HTML string containing the two tables
         (one for existing domains and one for non-existent domains).
-        Example: "<table>...</table><table>...</table>"
 
     score : float
-        Global risk score in [0.0, 1.0]. It will be shown in the text
+        Global risk score in [0.0, 100.0]. It will be shown in the text
         and used by the JS diagram.
+
+    recommend_div : str
+        Raw HTML for the recommendations block (can be one or several <p>).
 
     Returns
     -------
@@ -25,7 +30,7 @@ def build_domain_report_html(domain : str, tables_html: str, score: float, recom
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>DominAI – Domain Report</title>
+  <title>DomainAI – Report for __DOMAIN__</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -110,37 +115,11 @@ def build_domain_report_html(domain : str, tables_html: str, score: float, recom
       flex: 0 0 auto;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      justify-content: center;
     }
 
     .score-chart-container canvas {
       display: block;
-    }
-
-    .colorbar {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    .colorbar-gradient {
-      width: 18px;
-      height: 160px;
-      border-radius: 8px;
-      margin: 0 auto 0.25rem auto;
-      background: linear-gradient(to top, red, yellow, #7fd321, #00a000);
-      border: 1px solid rgba(0,0,0,0.2);
-    }
-
-    .colorbar-scale {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 160px;
-    }
-
-    .colorbar-scale span {
-      line-height: 1;
     }
 
     .tables-section {
@@ -214,34 +193,22 @@ def build_domain_report_html(domain : str, tables_html: str, score: float, recom
 
     <section class="score-section">
       <div class="score-text">
-        <h2>Overall Risk Score: <strong id="score-value">__SCORE_TEXT__</strong></h2>
+        <h2>Overall Risk Score: <strong id="score-value">__SCORE_TEXT__ / 100</strong></h2>
 
         <h3>Recommendations</h3>
         __RECOMMEND_DIV__
 
         <h3>Score Explanation</h3>
         <p id="score-explanation">
-          The score ranges from <strong>0.0</strong> (low concern) to <strong>1.0</strong> (high concern).
-          It reflects the proportion and nature of risky or confusingly similar domains that already exist
-          compared to the combinations evaluated. The coloured ring on the right shows how individual
-          domain groups contribute to the final score.
+          The score ranges from <strong>0</strong> (low concern, green) to <strong>100</strong> (high concern, red).
+          The coloured circle on the right acts like a traffic light: green for low risk, amber for moderate risk,
+          and red for high risk. The value summarises how many risky or confusingly similar domains exist
+          compared to the combinations evaluated.
         </p>
       </div>
 
       <div class="score-chart-container">
-        <canvas id="score-diagram" width="260" height="260" aria-label="risk score diagram"></canvas>
-
-        <div class="colorbar">
-          <div class="colorbar-gradient"></div>
-          <div class="colorbar-scale">
-            <span>1.0</span>
-            <span>0.8</span>
-            <span>0.6</span>
-            <span>0.4</span>
-            <span>0.2</span>
-            <span>0.0</span>
-          </div>
-        </div>
+        <canvas id="score-diagram" width="260" height="260" aria-label="risk score circle"></canvas>
       </div>
     </section>
 
@@ -254,16 +221,18 @@ def build_domain_report_html(domain : str, tables_html: str, score: float, recom
   </main>
 
   <script>
+    // Score in [0, 100]
     const DOMINAI_SCORE = __SCORE_JS__;
-    const segmentValues = Array(12).fill(DOMINAI_SCORE);
 
-    function valueToColor(v) {
-      const clamped = Math.min(1, Math.max(0, v));
-      const hue = 120 * clamped;
+    // Map score to traffic-light color:
+    // 0 -> green, 50 -> amber, 100 -> red
+    function scoreToColor(score) {
+      const norm = Math.min(100, Math.max(0, score)) / 100; // 0..1
+      const hue = 120 * (1 - norm); // 120 (green) -> 0 (red)
       return "hsl(" + hue + ", 80%, 50%)";
     }
 
-    function drawScoreDiagram(canvasId, score, segmentValues) {
+    function drawScoreCircle(canvasId, score) {
       const canvas = document.getElementById(canvasId);
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
@@ -274,74 +243,42 @@ def build_domain_report_html(domain : str, tables_html: str, score: float, recom
 
       ctx.clearRect(0, 0, width, height);
 
-      const nSeg = segmentValues.length;
-      const outerR = Math.min(width, height) * 0.48;
-      const innerR = outerR * 0.72;
-      const innerCircleR = innerR * 0.82;
+      const radius = Math.min(width, height) * 0.4;
 
-      const fullAngle = 2 * Math.PI;
-      const segAngle = fullAngle / nSeg;
-
-      ctx.save();
-      ctx.translate(cx, cy);
-
-      for (let i = 0; i < nSeg; i++) {
-        const value = segmentValues[i];
-        const start = -Math.PI / 2 + i * segAngle;
-        const end = start + segAngle;
-
-        ctx.beginPath();
-        ctx.arc(0, 0, outerR, start, end, false);
-        ctx.arc(0, 0, innerR, end, start, true);
-        ctx.closePath();
-        ctx.fillStyle = valueToColor(value);
-        ctx.fill();
-
-        ctx.strokeStyle = "rgba(0,0,0,0.15)";
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        const midAngle = (start + end) / 2;
-        const textR = (innerR + outerR) / 2;
-        const labelX = Math.cos(midAngle) * textR;
-        const labelY = Math.sin(midAngle) * textR;
-
-        ctx.fillStyle = "#111827";
-        ctx.font = "10px system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(String(i + 1), labelX, labelY);
-      }
-
+      // Filled circle with traffic-light color
       ctx.beginPath();
-      ctx.arc(0, 0, innerCircleR, 0, fullAngle);
+      ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
       ctx.closePath();
-      ctx.fillStyle = valueToColor(score);
+      ctx.fillStyle = scoreToColor(score);
       ctx.fill();
 
+      // Optional subtle border
+      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Score text
       ctx.fillStyle = "#111827";
       ctx.font = "bold 42px system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(score.toFixed(2), 0, 4);
-
-      ctx.restore();
+      ctx.fillText(score.toFixed(0), cx, cy);
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-      var scoreValueEl = document.getElementById("score-value");
+      const scoreValueEl = document.getElementById("score-value");
       if (scoreValueEl) {
-        scoreValueEl.textContent = DOMINAI_SCORE.toFixed(2);
+        scoreValueEl.textContent = DOMINAI_SCORE.toFixed(0) + " / 100";
       }
-      drawScoreDiagram("score-diagram", DOMINAI_SCORE, segmentValues);
+      drawScoreCircle("score-diagram", DOMINAI_SCORE);
     });
   </script>
 </body>
 </html>
 """
 
-    # Format score for text and JS
-    score_str = f"{score:.2f}"
+    # Format score for text and JS (integer 0–100)
+    score_str = f"{score:.0f}"
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     html = template.replace("__SCORE_TEXT__", score_str)

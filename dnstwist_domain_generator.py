@@ -63,14 +63,16 @@ def get_similar_registered_domains_sync_wrapper(domain: str) -> list[str]:
     """Función de interfaz para ejecutar el código asíncrono desde un contexto síncrono."""
     return asyncio.run(async_get_similar_registered_domains(domain))
 
-# --- Ejemplo de Uso ---
-base_domain = 'google.com' 
-dominios_registrados = get_similar_registered_domains_sync_wrapper(base_domain)
 
-print("\n--- Resultado Final ---")
-if dominios_registrados:
-    print("Dominios Similares y Registrados Encontrados:")
-    for d in dominios_registrados:
-        print(f"- {d}")
-else:
-    print("No se encontraron dominios similares registrados.")
+if __name__ == "__main__":
+    # --- Ejemplo de Uso ---
+    base_domain = 'google.com' 
+    dominios_registrados = get_similar_registered_domains_sync_wrapper(base_domain)
+
+    print("\n--- Resultado Final ---")
+    if dominios_registrados:
+        print("Dominios Similares y Registrados Encontrados:")
+        for d in dominios_registrados:
+            print(f"- {d}")
+    else:
+        print("No se encontraron dominios similares registrados.")

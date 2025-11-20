@@ -19,13 +19,11 @@ async function sendDomainQuery(domain) {
 
 // ---- UI wiring ----
 
-// Year in footer
 const yearEl = document.getElementById("year");
 if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
 
-// Mobile nav toggle
 const navToggle = document.getElementById("navToggle");
 const navLinks = document.getElementById("navLinks");
 
@@ -34,7 +32,6 @@ if (navToggle && navLinks) {
     navLinks.classList.toggle("open");
   });
 
-  // Close nav when clicking a link on mobile
   navLinks.addEventListener("click", (e) => {
     if (e.target.tagName === "A") {
       navLinks.classList.remove("open");
@@ -42,7 +39,6 @@ if (navToggle && navLinks) {
   });
 }
 
-// Domain form handling
 const domainForm = document.getElementById("domainForm");
 const domainInput = document.getElementById("domainInput");
 const statusSpan = document.querySelector("[data-status]");
@@ -52,7 +48,6 @@ function normalizeDomain(input) {
 }
 
 function isLikelyDomain(str) {
-  // Super simple heuristic, you can replace with a stricter regex if you want
   return /\./.test(str) && !/\s/.test(str);
 }
 
@@ -71,14 +66,21 @@ if (domainForm && domainInput && statusSpan) {
       return;
     }
 
-    statusSpan.textContent = `Querying ${domain}…`;
+    statusSpan.textContent = `Generating report for ${domain}…`;
     statusSpan.style.color = "#0f172a";
 
     try {
-      // 🔥 Call FastAPI backend
       const result = await sendDomainQuery(domain);
-      statusSpan.textContent = `${result.status.toUpperCase()}: ${result.detail}`;
-      statusSpan.style.color = "#0f172a";
+
+      if (result.status === "ok" && result.report_url) {
+        // 🔥 Redirect to the generated report page
+        window.location.href = result.report_url;
+
+        console.log("Redirecting to report:", result.report_url);
+      } else {
+        statusSpan.textContent = result.detail || "Unexpected response from server.";
+        statusSpan.style.color = "#b91c1c";
+      }
     } catch (err) {
       console.error(err);
       statusSpan.textContent = "An error occurred while querying the backend.";
@@ -86,7 +88,6 @@ if (domainForm && domainInput && statusSpan) {
     }
   });
 
-  // Explicit submit on Enter, though form already handles it by default
   domainInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       domainForm.dispatchEvent(new Event("submit"));

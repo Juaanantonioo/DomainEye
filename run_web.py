@@ -4,12 +4,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+import re
+from datetime import datetime
+from report_generator import generate_report_html
 
 # ---------- Paths ----------
 
 BASE_DIR = Path(__file__).resolve().parent          # project/
 WEB_DIR = BASE_DIR / "web"                          # project/web
 INDEX_FILE = WEB_DIR / "index.html"                 # project/web/index.html
+REPORTS_DIR = WEB_DIR / "reports"                   # project/web/reports
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)      # ensure exists
 
 # ---------- App ----------
 
@@ -48,18 +53,23 @@ class DomainResponse(BaseModel):
     domain: str
     status: str
     detail: str
+    report_url : str
 
+# ---------- Helpers ----------
+
+def _slugify_domain(domain: str) -> str:
+    """
+    Turn the domain into a safe-ish filename base.
+    """
+    # keep letters, numbers, dot and dash; replace others with '_'
+    base = re.sub(r"[^a-zA-Z0-9\.\-]", "_", domain)
+    if not base:
+        base = "report"
+    return base
 
 # ---------- Your Python logic ----------
 
 def run_python_logic(domain: str) -> DomainResponse:
-    """
-    Replace this with your real logic:
-    - call your LLM
-    - do DNS / WHOIS lookups
-    - run brand protection checks
-    - whatever you need.
-    """
     is_likely_valid = "." in domain and " " not in domain
 
     if not is_likely_valid:
@@ -67,14 +77,30 @@ def run_python_logic(domain: str) -> DomainResponse:
             domain=domain,
             status="error",
             detail="The provided string does not look like a valid domain.",
+            report_url=None,
         )
+
+    # 1) Generate HTML content using another method/file
+    html_content = generate_report_html(domain)
+
+    # 2) Build a unique filename
+    slug = _slugify_domain(domain)
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    filename = f"{slug}_{timestamp}.html"
+
+    # 3) Write file to web/reports/<filename>
+    file_path = REPORTS_DIR / filename
+    file_path.write_text(html_content, encoding="utf-8")
+
+    # 4) Public URL (because /web is mounted on WEB_DIR)
+    report_url = f"/web/reports/{filename}"
 
     return DomainResponse(
         domain=domain,
         status="ok",
-        detail=f"Python backend processed domain '{domain}'. Plug your real logic here.",
+        detail=f"Report generated for domain '{domain}'.",
+        report_url=report_url,
     )
-
 
 # ---------- API Routes ----------
 

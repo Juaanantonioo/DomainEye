@@ -14,5 +14,6 @@ pip install numpy
 pip install whois
 pip install dnspython
 pip install Levenshtein
-pip install fuzz
+pip install 
+pip install aiodns          
 ```

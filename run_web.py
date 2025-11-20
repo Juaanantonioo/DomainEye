@@ -87,12 +87,14 @@ async def run_python_logic(domain: str) -> DomainResponse:
     # 1) Llamada async (tu función ya es async)
     tablas, rec_params = await generar_informe_score(domain)
 
+    recomendaciones = generar_recomendaciones_html(rec_params)
+
     # Armamos el HTML final
     html_content = build_domain_report_html(
         domain,
         tablas,
         111,
-        "RECOMENDACIONES_DIV_AQUI"
+        recomendaciones
     )
 
     # 2) Filename único

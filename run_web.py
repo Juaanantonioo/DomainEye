@@ -116,7 +116,7 @@ async def run_python_logic(domain: str) -> DomainResponse:
     return DomainResponse(
         domain=domain,
         status="ok",
-        detail=f"Report generated for domain '{domain}'.",
+        detail=f"Informe para el dominio generado '{domain}'.",
         report_url=report_url,
     )
 

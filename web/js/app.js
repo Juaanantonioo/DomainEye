@@ -59,14 +59,14 @@ if (domainForm && domainInput && statusSpan) {
     const domain = normalizeDomain(raw);
 
     if (!domain || !isLikelyDomain(domain)) {
-      statusSpan.textContent = "Please enter a valid domain.";
+      statusSpan.textContent = "Porfavor, introduce un dominio valido.";
       statusSpan.style.color = "#b91c1c";
       domainInput.focus();
       domainInput.select();
       return;
     }
 
-    statusSpan.textContent = `Generating report for ${domain}…`;
+    statusSpan.textContent = `Generando informa para ${domain}…`;
     statusSpan.style.color = "#0f172a";
 
     try {
@@ -78,7 +78,8 @@ if (domainForm && domainInput && statusSpan) {
 
         console.log("Redirecting to report:", result.report_url);
       } else {
-        statusSpan.textContent = result.detail || "Unexpected response from server.";
+        statusSpan.textContent =
+          result.detail || "Unexpected response from server.";
         statusSpan.style.color = "#b91c1c";
       }
     } catch (err) {

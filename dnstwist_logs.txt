@@ -1,0 +1,9 @@
+[34m*original    [39m ewala.es   75.2.60.5 [33mNS:[36mns1-02.azure-dns.com[39m [33mMX:[36mewala-es.mail.protection.outlook.com[39m
+[34mbitsquatting [39m egala.es   213.186.33.5 [33mNS:[36mdns103.ovh.net[39m [33mMX:[36mmx3.mail.ovh.net[39m
+[34mbitsquatting [39m evala.es   217.160.0.215 2001:8d8:100f:f000::200 [33mNS:[36mns1033.ui-dns.biz[39m [33mMX:[36mmx00.ionos.es[39m
+[34momission     [39m eala.es    217.160.0.122 2001:8d8:100f:f000::2a9 [33mNS:[36mns1052.ui-dns.org[39m [33mMX:[36mmx00.ionos.es[39m
+[34momission     [39m wala.es    78.46.146.169 [33mNS:[36mpns01.dcsix.net[39m
+[34mreplacement  [39m ewals.es   199.60.103.198 [33mNS:[36mns1.register.be[39m [33mMX:[36mmail.ewals.es[39m
+[34mreplacement  [39m exala.es   [33mNS:[36migor.ns.cloudflare.com[39m [33mMX:[36mmx00.ionos.es[39m
+[34msubdomain    [39m ew.ala.es  75.125.147.211 [33mNS:[36mns2.dondominio.com[39m
+[34mvowel-swap   [39m owala.es   217.19.248.132 [33mNS:[36mdns1.idp365.net[39m

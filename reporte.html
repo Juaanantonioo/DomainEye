@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe de dominios sospechosos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background: #fafafa;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f2f2f2;
+      font-weight: bold;
+    }
+
+    /* Colores de riesgo */
+    .risk-low { background: #d4edda; }      /* verde claro */
+    .risk-med { background: #fff3cd; }      /* amarillo */
+    .risk-high { background: #f8d7da; }     /* rojo claro */
+
+    /* Hover */
+    tr:hover {
+      background: #f5f5f5;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 13px;
+      color: #777;
+    }
+
+    .score-box {
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Posibles dominios de suplantación para: <span style="color:#0077cc">{{ base_domain }}</span></h1>
+
+  <table>
+    <tr>
+      <th>Dominio</th>
+      <th>Score</th>
+      <th>IP</th>
+      <th>Fecha creación</th>
+      <th>País</th>
+      <th>Acciones recomendadas</th>
+      <th>Señales activas</th>
+    </tr>
+
+    <!-- Aquí iteras en tu script e insertas filas -->
+
+  </table>
+
+  <p class="footer">
+    Generado automáticamente por el analizador de dominios maliciosos.<br>
+    Scores basados en señales WHOIS, DNS, HTTP, contenido y similitud.
+  </p>
+
+</body>
+</html>

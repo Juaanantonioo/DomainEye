@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="/web/js/app.js" defer></script>
+  <!--<img src="/web/logo-dominai.svg" alt="DominAI logo">-->
+
   <meta charset="UTF-8" />
-  <title>DominAI</title>
+  <title>DomainEye</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -458,7 +461,7 @@
     <div class="nav-container">
       <div class="brand">
         <div class="brand-icon"></div>
-        <span>DominAI</span>
+        <span>DomainEye</span>
       </div>
 
       <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
@@ -546,70 +549,5 @@
     </span>
   </footer>
 
-  <script>
-    // Year in footer
-    document.getElementById("year").textContent = new Date().getFullYear();
-
-    // Mobile nav toggle
-    const navToggle = document.getElementById("navToggle");
-    const navLinks = document.getElementById("navLinks");
-    navToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("open");
-    });
-
-    // Close nav when clicking a link on mobile
-    navLinks.addEventListener("click", (e) => {
-      if (e.target.tagName === "A") {
-        navLinks.classList.remove("open");
-      }
-    });
-
-    // Domain form handling
-    const domainForm = document.getElementById("domainForm");
-    const domainInput = document.getElementById("domainInput");
-    const statusSpan = document.querySelector("[data-status]");
-
-    function normalizeDomain(input) {
-      return input.trim();
-    }
-
-    function isLikelyDomain(str) {
-      // Super simple heuristic, you can replace with a stricter regex if you want
-      return /\./.test(str) && !/\s/.test(str);
-    }
-
-    domainForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-
-      const raw = domainInput.value;
-      const domain = normalizeDomain(raw);
-
-      if (!domain || !isLikelyDomain(domain)) {
-        statusSpan.textContent = "Please enter a valid domain.";
-        statusSpan.style.color = "#b91c1c";
-        domainInput.focus();
-        domainInput.select();
-        return;
-      }
-
-      statusSpan.textContent = `Querying ${domain}…`;
-      statusSpan.style.color = "#0f172a";
-
-      // Here you would call your real backend / API.
-      // For now, we simulate a quick async action:
-      setTimeout(() => {
-        statusSpan.textContent = `Finished query for ${domain}. (Hook your API here)`;
-        statusSpan.style.color = "#0f172a";
-        console.log("Domain queried:", domain);
-      }, 600);
-    });
-
-    // Explicit submit on Enter, though form already handles it by default
-    domainInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        domainForm.dispatchEvent(new Event("submit"));
-      }
-    });
-  </script>
 </body>
 </html>

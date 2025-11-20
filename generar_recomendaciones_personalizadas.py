@@ -130,6 +130,38 @@ def generar_recomendaciones(params: RecomendacionesParams) -> dict:
     }
 
 
+def generar_recomendaciones_html(params: RecomendacionesParams) -> str:
+    # Obtener las recomendaciones en formato dict
+    recomendaciones = generar_recomendaciones(params)
+
+    generales = recomendaciones.get("generales", [])
+    especificas = recomendaciones.get("especificas", [])
+
+    # Construir listas HTML
+    html_generales = "".join(f"<li>{item}</li>" for item in generales)
+    html_especificas = "".join(f"<li>{item}</li>" for item in especificas)
+
+    # Construcción final del HTML
+    html = f"""
+    <div class="recomendaciones">
+        <h2>Recomendaciones Generales</h2>
+        <ul>
+            {html_generales}
+        </ul>
+
+        <h2>Recomendaciones Específicas para el dominio más problemático</h2>
+        <ul>
+            {html_especificas}
+        </ul>
+    </div>
+    """
+
+    # Limpieza opcional (retirar espacios innecesarios)
+    return "\n".join(line.strip() for line in html.split("\n") if line.strip())
+
+    
+
+
 if __name__ == "__main__":
     params = RecomendacionesParams([12, 20, 32, 12, 15, 17], [datetime.now()], ["España", "España", "España", "Italia", "Italia", "Portugal"], "evvala.es", 30, datetime.now(), "España", "Alto riesgo: revisar contenido y considerar denuncia al registrador/hosting.", 100, "ewala.es")
     res = generar_recomendaciones(params)

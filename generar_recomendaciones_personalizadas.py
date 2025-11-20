@@ -45,12 +45,11 @@ def average(nums: List[int]) -> int:
         raise ValueError("Cannot compute average of an empty list")
     return sum(nums) // len(nums)
 
-def pais_frecuente(paises: List[str]) -> str:
+def pais_frecuente(paises: list[str]) -> str:
+    """Devuelve el país más frecuente de la lista. Si está vacía, devuelve '-'"""
     if not paises:
-        raise ValueError("La lista está vacía")
-    contador = Counter(paises)
-    # `most_common(1)` devuelve una lista con tupla (pais, cantidad)
-    return contador.most_common(1)[0][0]
+        return "-"
+    return Counter(paises).most_common(1)[0][0]
 
 class RecomendacionesParams:
     # Datos generales de los dominios analizados

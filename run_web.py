@@ -85,7 +85,7 @@ async def run_python_logic(domain: str) -> DomainResponse:
         )
 
     # 1) Llamada async (tu función ya es async)
-    tablas = await generar_informe_score(domain)
+    tablas, rec_params = await generar_informe_score(domain)
 
     # Armamos el HTML final
     html_content = build_domain_report_html(

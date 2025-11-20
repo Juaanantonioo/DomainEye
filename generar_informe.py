@@ -392,12 +392,13 @@ def build_rows(base_domain: str, candidates: list, base_http_data: dict):
 
     return ordered_rows_html, all_scores, all_results
 
-from statistics import mean as average
-from datetime import datetime
+
 from collections import Counter
+from datetime import datetime
+from statistics import mean as average
 
 def pais_frecuente(paises: list[str]) -> str:
-    """Devuelve el país más frecuente de la lista."""
+    """Devuelve el país más frecuente de la lista. Si está vacía, devuelve '-'"""
     if not paises:
         return "-"
     return Counter(paises).most_common(1)[0][0]
@@ -406,9 +407,22 @@ def pais_frecuente(paises: list[str]) -> str:
 def transform_all_results_to_recomendaciones(all_results: list[dict], base_domain: str) -> RecomendacionesParams:
     """
     Transforma all_results (devuelto por build_rows) en un objeto RecomendacionesParams.
+    No asume que la lista tenga datos de país ni que esté vacía.
     """
     if not all_results:
-        raise ValueError("all_results está vacío")
+        # Si no hay resultados, devolvemos un objeto con valores por defecto
+        return RecomendacionesParams(
+            scores=[],
+            creaciones=[],
+            paises=[],
+            importante_domain=base_domain,
+            importante_score=0,
+            importante_creation_date=datetime.utcnow(),
+            importante_country="-",
+            importante_action="-",
+            score_maximo=0,
+            dominio_propio=base_domain
+        )
 
     # 1) Extraemos listas para cálculo general
     scores = [r["score"] for r in all_results]
@@ -423,11 +437,11 @@ def transform_all_results_to_recomendaciones(all_results: list[dict], base_domai
     importante_domain = importante["domain"]
     importante_score = importante["score"]
     importante_creation_date = creation_dates[0]
-    importante_country = importante["country"]
-    importante_action = importante["action"]
+    importante_country = importante.get("country", "-") or "-"
+    importante_action = importante.get("action", "-") or "-"
 
     # 3) Score máximo
-    score_maximo = max(scores)
+    score_maximo = max(scores) if scores else 0
     
     # 4) Dominio propio (base_domain)
     dominio_propio = base_domain
@@ -466,7 +480,7 @@ async def generar_informe_score(domain: str):
     # Si build_rows es síncrona, se mantiene, si no, la hacemos async también
     table_rows_html, all_scores, all_results = build_rows(base_domain, candidates, base_http_data)
 
-    # recomendaciones = transform_all_results_to_recomendaciones(all_results, base_domain)
+    rec_params = transform_all_results_to_recomendaciones(all_results, base_domain)
 
     # Riesgo global
     global_risk_score = calculate_global_risk(all_scores)
@@ -486,7 +500,8 @@ async def generar_informe_score(domain: str):
         html = html.replace(marker, table_rows_html)
     else:
         html = html.replace("</table>", table_rows_html + "\n  </table>")
-    return html
+
+    return html, rec_params
  
 # -------- main --------
 
@@ -536,7 +551,8 @@ def main():
 
 
 def prueba():
-    print(generar_informe_score("ewala.com"))
+    res = asyncio.run(generar_informe_score("ewala.com"))
+    print(res)
     
 if __name__ == "__main__":
     prueba()

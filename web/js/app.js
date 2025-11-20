@@ -66,7 +66,7 @@ if (domainForm && domainInput && statusSpan) {
       return;
     }
 
-    statusSpan.textContent = `Generando informa para ${domain}…`;
+    statusSpan.textContent = `Generando informe para ${domain}…`;
     statusSpan.style.color = "#0f172a";
 
     try {

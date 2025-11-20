@@ -5,7 +5,7 @@ from google import genai
 from google.genai import types
 
 def call_google_llm(prompt: str, model: str = "gemini-2.5-flash") -> str:
-    api_key = "AIzaSyBPoXXaoCfwNvUKYEPhIniFt1AZRVEXXKo"
+    api_key = "AIzaSyDh71DzvkcOdhfiya-Kh5AwKvVPbwXaV1o"
     if not api_key:
         raise ValueError("Please set the GOOGLE_API_KEY environment variable")
 

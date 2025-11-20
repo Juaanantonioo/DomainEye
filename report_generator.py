@@ -2,7 +2,7 @@ from datetime import datetime
 
 def build_domain_report_html(domain: str, tables_html: str, score: float, recommend_div: str) -> str:
     """
-    Build the full DominAI report HTML.
+    Build the full DominAI report HTML with the same color system as the main index page.
 
     Parameters
     ----------
@@ -30,17 +30,23 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>DomainAI – Report for __DOMAIN__</title>
+  <title>DominAI – Report for __DOMAIN__</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
     :root {
-      --bg: #f4f5fb;
-      --text-main: #111827;
-      --text-muted: #6b7280;
+      --bg-gradient-start: #a8ff78; /* lime-ish */
+      --bg-gradient-end: #78ffd6;   /* light blue/teal */
       --accent: #00c899;
-      --border: #e5e7eb;
-      --card-bg: #ffffff;
+      --accent-soft: rgba(0, 200, 153, 0.15);
+      --text-main: #0b1721;
+      --text-muted: #5f6c7b;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --border-subtle: rgba(0, 0, 0, 0.06);
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.18);
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+      --transition-fast: 150ms ease-out;
     }
 
     * {
@@ -50,41 +56,82 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
     }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
       color: var(--text-main);
-      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
     }
 
-    .report {
-      max-width: 1100px;
-      margin: 0 auto;
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem 3rem;
+    }
+
+    .report-card {
+      max-width: 900px;
+      width: 100%;
       background: var(--card-bg);
-      border-radius: 18px;
-      padding: 2rem 2.2rem 2.5rem;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+      border-radius: 24px;
+      padding: 2.5rem 2.3rem 2.3rem;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(14px);
+      position: relative;
+      overflow: hidden;
     }
 
-    header h1 {
-      font-size: 1.8rem;
-      margin-bottom: 0.4rem;
+    .report-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(0, 200, 153, 0.2), transparent 60%);
+      mix-blend-mode: soft-light;
+      opacity: 0.9;
+      pointer-events: none;
     }
 
-    header p {
+    .report-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    header.report-header h1 {
+      font-size: clamp(1.7rem, 3vw, 2.1rem);
+      margin-bottom: 0.25rem;
+      color: var(--text-main);
+    }
+
+    header.report-header p.meta {
+      font-size: 0.82rem;
       color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header.report-header p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.6rem;
     }
 
     h2 {
       font-size: 1.2rem;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.7rem;
+      color: var(--text-main);
     }
 
     h3 {
       font-size: 1rem;
-      margin-top: 1.2rem;
+      margin-top: 1.1rem;
       margin-bottom: 0.4rem;
+      color: var(--text-main);
     }
 
     .score-section {
@@ -92,7 +139,7 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
       flex-wrap: wrap;
       gap: 2rem;
       align-items: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2.1rem;
     }
 
     .score-text {
@@ -101,10 +148,10 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
     }
 
     .score-text p {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--text-muted);
       line-height: 1.5;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.7rem;
     }
 
     .score-text strong {
@@ -123,43 +170,45 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
     }
 
     .tables-section {
-      margin-top: 1rem;
+      margin-top: 0.7rem;
     }
 
     .tables-section h2 {
-      margin-bottom: 1rem;
+      margin-bottom: 0.9rem;
     }
 
     .tables-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1.2rem;
     }
 
     .tables-wrapper table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.9rem;
-      border-radius: 12px;
+      border-radius: 16px;
       overflow: hidden;
-      border: 1px solid var(--border);
-      background-color: #ffffff;
+      border: 1px solid var(--border-subtle);
+      background-color: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
     }
 
     .tables-wrapper thead {
-      background: linear-gradient(135deg, #a8ff78, #78ffd6);
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
     }
 
     .tables-wrapper th,
     .tables-wrapper td {
       padding: 0.55rem 0.75rem;
       text-align: left;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--border-subtle);
     }
 
     .tables-wrapper th {
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
+      color: var(--text-main);
     }
 
     .tables-wrapper tbody tr:nth-child(even) {
@@ -171,51 +220,64 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
     }
 
     @media (max-width: 768px) {
-      .report {
-        padding: 1.5rem 1.3rem 2rem;
+      main {
+        padding-inline: 1rem;
       }
-      header h1 {
-        font-size: 1.5rem;
+      .report-card {
+        padding: 2rem 1.5rem 2rem;
+        border-radius: 20px;
       }
       .score-section {
         align-items: flex-start;
       }
     }
+
+    @media (max-width: 480px) {
+      header.report-header h1 {
+        font-size: 1.6rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <main class="report">
-    <header>
-      <h1>Report for __DOMAIN__</h1>
-      <p class="meta">Generated at __TIME__</p>
-      <p>Automatically generated analysis of your domain space and potential brand-abuse risk.</p>
-    </header>
+  <main>
+    <section class="report-card">
+      <div class="report-inner">
+        <header class="report-header">
+          <h1>Report for __DOMAIN__</h1>
+          <p class="meta">Generated at __TIME__</p>
+          <p class="subtitle">
+            Automatically generated analysis of your domain space and potential brand-abuse risk.
+          </p>
+        </header>
 
-    <section class="score-section">
-      <div class="score-text">
-        <h2>Overall Risk Score: <strong id="score-value">__SCORE_TEXT__ / 100</strong></h2>
+        <section class="score-section">
+          <div class="score-text">
+            <h2>Overall Risk Score: <strong id="score-value">__SCORE_TEXT__ / 100</strong></h2>
 
-        <h3>Recommendations</h3>
-        __RECOMMEND_DIV__
+            <h3>Recommendations</h3>
+            __RECOMMEND_DIV__
 
-        <h3>Score Explanation</h3>
-        <p id="score-explanation">
-          The score ranges from <strong>0</strong> (low concern, green) to <strong>100</strong> (high concern, red).
-          The coloured circle on the right acts like a traffic light: green for low risk, amber for moderate risk,
-          and red for high risk. The value summarises how many risky or confusingly similar domains exist
-          compared to the combinations evaluated.
-        </p>
-      </div>
+            <h3>Score Explanation</h3>
+            <p id="score-explanation">
+              The score ranges from <strong>0</strong> (low concern, green) to <strong>100</strong> (high concern, red).
+              The coloured circle on the right acts like a traffic light: green for low risk, amber for moderate risk,
+              and red for high risk. The value summarises how many risky or confusingly similar domains exist
+              compared to the combinations evaluated.
+            </p>
+          </div>
 
-      <div class="score-chart-container">
-        <canvas id="score-diagram" width="260" height="260" aria-label="risk score circle"></canvas>
-      </div>
-    </section>
+          <div class="score-chart-container">
+            <canvas id="score-diagram" width="260" height="260" aria-label="risk score circle"></canvas>
+          </div>
+        </section>
 
-    <section class="tables-section">
-      <h2>Domain Lists</h2>
-      <div class="tables-wrapper">
-        __TABLES__
+        <section class="tables-section">
+          <h2>Domain Lists</h2>
+          <div class="tables-wrapper">
+            __TABLES__
+          </div>
+        </section>
       </div>
     </section>
   </main>
@@ -252,7 +314,7 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
       ctx.fillStyle = scoreToColor(score);
       ctx.fill();
 
-      // Optional subtle border
+      // Subtle border
       ctx.strokeStyle = "rgba(0,0,0,0.25)";
       ctx.lineWidth = 2;
       ctx.stroke();

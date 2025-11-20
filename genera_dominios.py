@@ -28,7 +28,9 @@ def generate_registered_candidates(base_domain: str):
     for candidate in dns_dg.get_similar_registered_domains_sync_wrapper(base_domain):
         candidates.add(candidate)
 
-    return sorted(candidates)
+    if len(candidates) <= 5:
+        return sorted(candidates)
+    return sorted(candidates[0:5])
 
 def generate_all_candidates(base_domain: str):
     name, _, tld = base_domain.partition(".")
@@ -47,7 +49,9 @@ def generate_all_candidates(base_domain: str):
     candidates.discard(base_domain)
     
     fuzzer = dnstwist.Fuzzer(base_domain)
-    fuzzer.generate()
+    fuzzer.generate(fuzzers=[			'addition', 'bitsquatting', 'hyphenation',
+			'insertion', 'omission', 'plural', 'repetition', 'replacement',
+			'subdomain', 'transposition', 'vowel-swap', 'dictionary'])
     for candidate in [e["domain"] for e in fuzzer.domains]:
         candidates.add(candidate)
 

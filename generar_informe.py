@@ -390,7 +390,41 @@ def build_rows(base_domain: str, candidates: list, base_http_data: dict):
 
     return ordered_rows_html, all_scores
 
+def generar_informe_score(domain : str):
+    base_domain = domain.strip()
+    brand = base_domain.split(".")[0]
 
+    print(f"[+] Generando candidatos para: {base_domain}")
+    candidates = generate_registered_candidates(base_domain)
+    print(f"[+] Se han generado {len(candidates)} dominios candidatos.")
+
+    print("[+] Analizando dominio base para extraer favicon y señales de marca...")
+    base_http_data = get_http_data(base_domain, brand)
+
+    print("[+] Recopilando WHOIS/DNS/HTTP y calculando scores...")
+    table_rows_html, all_scores = build_rows(base_domain, candidates, base_http_data)
+
+    # Riesgo global
+    global_risk_score = calculate_global_risk(all_scores)
+    print(f"[+] Riesgo Global (porcentaje de dominios de Alto Riesgo): {global_risk_score}%")
+
+    # Leer la plantilla HTML
+    with open("web_report.html", "r", encoding="utf-8") as f:
+        template = f.read()
+
+    # Reemplazar marcador del dominio base y el riesgo global
+    html = template.replace("{{ base_domain }}", base_domain)
+    html = html.replace("{{ global_risk_score }}", str(global_risk_score))
+
+    # Insertar filas en la tabla donde está el comentario
+    marker = "<!-- Aquí iteras en tu script e insertas filas -->"
+    if marker in html:
+        html = html.replace(marker, table_rows_html)
+    else:
+        html = html.replace("</table>", table_rows_html + "\n  </table>")
+
+    return html
+ 
 # -------- main --------
 
 def main():
@@ -438,5 +472,8 @@ def main():
     print("[+] Ábrelo en tu navegador para la demo.")
 
 
+def prueba():
+    print(generar_informe_score("ewala.com"))
+    
 if __name__ == "__main__":
-    main()
+    prueba()

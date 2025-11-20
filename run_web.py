@@ -6,7 +6,9 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import re
 from datetime import datetime
-from report_generator import generate_report_html
+from report_generator import build_domain_report_html
+from generar_informe import generar_informe_score
+from generar_recomendaciones_personalizadas import generar_recomendaciones_html, RecomendacionesParams
 
 # ---------- Paths ----------
 
@@ -81,7 +83,11 @@ def run_python_logic(domain: str) -> DomainResponse:
         )
 
     # 1) Generate HTML content using another method/file
-    html_content = generate_report_html(domain)
+    tablas, score_cluster = generar_informe_score(domain)
+
+    #recommend_div = generar_recomendaciones_html(RecomendacionesParams(domain=domain, score=score))
+
+    html_content = build_domain_report_html(domain, tablas, 111, "RECOMENDACIONES_DIV_AQUI")
 
     # 2) Build a unique filename
     slug = _slugify_domain(domain)

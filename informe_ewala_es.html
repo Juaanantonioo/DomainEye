@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe de dominios sospechosos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background: #fafafa;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f2f2f2;
+      font-weight: bold;
+    }
+
+    /* Colores de riesgo */
+    .risk-low { background: #d4edda; }      /* verde claro */
+    .risk-med { background: #fff3cd; }      /* amarillo */
+    .risk-high { background: #f8d7da; }     /* rojo claro */
+
+    /* Hover */
+    tr:hover {
+      background: #f5f5f5;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 13px;
+      color: #777;
+    }
+
+    .score-box {
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Posibles dominios de suplantación para: <span style="color:#0077cc">ewala.es</span></h1>
+
+  <table>
+    <tr>
+      <th>Dominio</th>
+      <th>Score</th>
+      <th>IP</th>
+      <th>Fecha creación</th>
+      <th>País</th>
+      <th>Acciones recomendadas</th>
+      <th>Señales activas</th>
+    </tr>
+
+    
+        <tr class="risk-med">
+          <td>eala.es</td>
+          <td>35</td>
+          <td>217.160.0.122</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Riesgo medio: monitorizar y revisar periódicamente.</td>
+          <td>Nombre muy similar al original (distancia Levenshtein = 1)<br>Formulario o login sin cabeceras de protección CSP/HSTS</td>
+        </tr>
+        
+        <tr class="risk-low">
+          <td>ewals.es</td>
+          <td>25</td>
+          <td>199.60.103.198</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Riesgo bajo: monitorizar de forma pasiva.</td>
+          <td>Nombre muy similar al original (distancia Levenshtein = 1)<br>Sitio con certificado TLS válido (HTTPS activo)</td>
+        </tr>
+        
+        <tr class="risk-low">
+          <td>wala.es</td>
+          <td>25</td>
+          <td>78.46.146.169</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Riesgo bajo: monitorizar de forma pasiva.</td>
+          <td>Nombre muy similar al original (distancia Levenshtein = 1)<br>Sitio con certificado TLS válido (HTTPS activo)</td>
+        </tr>
+        
+        <tr class="risk-low">
+          <td>egala.es</td>
+          <td>20</td>
+          <td>213.186.33.5</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Riesgo bajo: monitorizar de forma pasiva.</td>
+          <td>Nombre muy similar al original (distancia Levenshtein = 1)</td>
+        </tr>
+        
+        <tr class="risk-low">
+          <td>evala.es</td>
+          <td>20</td>
+          <td>217.160.0.215</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Riesgo bajo: monitorizar de forma pasiva.</td>
+          <td>Nombre muy similar al original (distancia Levenshtein = 1)</td>
+        </tr>
+        
+        <tr class="risk-low">
+          <td>owala.es</td>
+          <td>20</td>
+          <td>217.19.248.132</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Riesgo bajo: monitorizar de forma pasiva.</td>
+          <td>Nombre muy similar al original (distancia Levenshtein = 1)</td>
+        </tr>
+        
+        <tr class="risk-low">
+          <td>ew.ala.es</td>
+          <td>0</td>
+          <td>75.125.147.211</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Riesgo bajo: monitorizar de forma pasiva.</td>
+          <td>-</td>
+        </tr>
+        
+        <tr class="risk-low">
+          <td>ewala.es</td>
+          <td>0</td>
+          <td>99.83.231.61</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Riesgo bajo: monitorizar de forma pasiva.</td>
+          <td>Nombre muy similar al original (distancia Levenshtein = 0)<br>Dominio defensivo registrado por la propia marca (redirige al sitio oficial)</td>
+        </tr>
+        
+
+  </table>
+
+  <p class="footer">
+    Generado automáticamente por el analizador de dominios maliciosos.<br>
+    Scores basados en señales WHOIS, DNS, HTTP, contenido y similitud.
+  </p>
+
+</body>
+</html>

@@ -66,3 +66,7 @@ def generar_recomendaciones(dominio_propio: str, dominio_externo: str,
 
     return lista_parsed
 
+
+if __name__ == "__main__":
+    res = generar_recomendaciones("ewala.es", "evvala.es", 20, 100)
+    print(res)

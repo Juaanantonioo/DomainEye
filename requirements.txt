@@ -39,3 +39,5 @@ typing_extensions==4.15.0
 urllib3==2.5.0
 websockets==15.0.1
 whois==1.20240129.2
+fastapi
+uvicorn[standard]

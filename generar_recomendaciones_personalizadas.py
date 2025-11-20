@@ -46,7 +46,7 @@ def generar_recomendaciones(dominio_propio: str, dominio_externo: str,
         f"de typesquatting para mi dominio {dominio_propio}, ya que el "
         f"dominio {dominio_externo} podría suplantar la web de mi marca. "
         f"Dame una lista de {num_frases} frases cortas para ayudar al "
-        f"usuario a identificar. Solo devuelve la lista, no digas nada mas, "
+        f"generente a a solventar el problema, en concreto, teniendo el tipo de typesquatting y la gravedad asignada. Solo devuelve la lista, no digas nada mas, "
         f"debe poder ser parseable por python ast, asi que no especifiques nada de markdown tampoco"
     )
 
@@ -56,7 +56,11 @@ def generar_recomendaciones(dominio_propio: str, dominio_externo: str,
     lista_parsed = []
 
     while True:
-        lista_parsed = parse_list(lista_str)
+        try:
+            lista_parsed = parse_list(lista_str)
+        except:
+            print("Exception occured")
+            lista_parsed = []
 
         if len(lista_parsed) == num_frases:
             break

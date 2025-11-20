@@ -59,10 +59,9 @@ async def async_get_similar_registered_domains(domain: str) -> list[str]:
     return registered_domains
 
 # --- 3. ENVOLTORIO SÍNCRONO PARA EJECUTAR EL BUCLE ---
-def get_similar_registered_domains_sync_wrapper(domain: str) -> list[str]:
-    """Función de interfaz para ejecutar el código asíncrono desde un contexto síncrono."""
-    return asyncio.run(async_get_similar_registered_domains(domain))
-
+async def get_similar_registered_domains(domain: str) -> list[str]:
+    """Devuelve dominios similares registrados (async)."""
+    return await async_get_similar_registered_domains(domain)
 
 if __name__ == "__main__":
     # --- Ejemplo de Uso ---

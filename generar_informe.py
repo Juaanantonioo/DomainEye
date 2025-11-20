@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import asyncio
 import sys
 import hashlib
 import socket
@@ -16,6 +17,7 @@ import dns.resolver
 import dnstwist  # si luego lo usáis para generar dominios
 
 from genera_dominios import generate_registered_candidates
+from generar_recomendaciones_personalizadas import RecomendacionesParams
 from scoring import score_domain
 
 # Timeout global de sockets (WHOIS, DNS, HTTP)
@@ -388,41 +390,102 @@ def build_rows(base_domain: str, candidates: list, base_http_data: dict):
         """
         ordered_rows_html += row
 
-    return ordered_rows_html, all_scores
+    return ordered_rows_html, all_scores, all_results
 
-def generar_informe_score(domain : str):
+from statistics import mean as average
+from datetime import datetime
+from collections import Counter
+
+def pais_frecuente(paises: list[str]) -> str:
+    """Devuelve el país más frecuente de la lista."""
+    if not paises:
+        return "-"
+    return Counter(paises).most_common(1)[0][0]
+
+
+def transform_all_results_to_recomendaciones(all_results: list[dict], base_domain: str) -> RecomendacionesParams:
+    """
+    Transforma all_results (devuelto por build_rows) en un objeto RecomendacionesParams.
+    """
+    if not all_results:
+        raise ValueError("all_results está vacío")
+
+    # 1) Extraemos listas para cálculo general
+    scores = [r["score"] for r in all_results]
+    creation_dates = [
+        datetime.strptime(r["creation_date"], "%Y-%m-%d") if r["creation_date"] != "-" else datetime.utcnow()
+        for r in all_results
+    ]
+    paises = [r["country"] for r in all_results if r["country"] != "-"]
+
+    # 2) Dominio importante (primer elemento, ya que build_rows ordena por score desc)
+    importante = all_results[0]
+    importante_domain = importante["domain"]
+    importante_score = importante["score"]
+    importante_creation_date = creation_dates[0]
+    importante_country = importante["country"]
+    importante_action = importante["action"]
+
+    # 3) Score máximo
+    score_maximo = max(scores)
+    
+    # 4) Dominio propio (base_domain)
+    dominio_propio = base_domain
+
+    # 5) Creamos el objeto RecomendacionesParams
+    recomendaciones = RecomendacionesParams(
+        scores=scores,
+        creaciones=creation_dates,
+        paises=paises,
+        importante_domain=importante_domain,
+        importante_score=importante_score,
+        importante_creation_date=importante_creation_date,
+        importante_country=importante_country,
+        importante_action=importante_action,
+        score_maximo=score_maximo,
+        dominio_propio=dominio_propio
+    )
+
+    return recomendaciones
+
+
+async def generar_informe_score(domain: str):
     base_domain = domain.strip()
     brand = base_domain.split(".")[0]
 
     print(f"[+] Generando candidatos para: {base_domain}")
-    candidates = generate_registered_candidates(base_domain)
+    candidates = await generate_registered_candidates(base_domain)   # <── await
     print(f"[+] Se han generado {len(candidates)} dominios candidatos.")
 
     print("[+] Analizando dominio base para extraer favicon y señales de marca...")
+    # Si esta función es síncrona, se mantiene así
     base_http_data = get_http_data(base_domain, brand)
 
     print("[+] Recopilando WHOIS/DNS/HTTP y calculando scores...")
-    table_rows_html, all_scores = build_rows(base_domain, candidates, base_http_data)
+    
+    # Si build_rows es síncrona, se mantiene, si no, la hacemos async también
+    table_rows_html, all_scores, all_results = build_rows(base_domain, candidates, base_http_data)
+
+    # recomendaciones = transform_all_results_to_recomendaciones(all_results, base_domain)
 
     # Riesgo global
     global_risk_score = calculate_global_risk(all_scores)
     print(f"[+] Riesgo Global (porcentaje de dominios de Alto Riesgo): {global_risk_score}%")
 
-    # Leer la plantilla HTML
-    with open("web_report.html", "r", encoding="utf-8") as f:
-        template = f.read()
+    # Leer plantilla HTML (operación I/O blocking, debe ir con to_thread)
+    template = await asyncio.to_thread(
+        lambda: open("web_report.html", "r", encoding="utf-8").read()
+    )
 
-    # Reemplazar marcador del dominio base y el riesgo global
+    # Reemplazos
     html = template.replace("{{ base_domain }}", base_domain)
     html = html.replace("{{ global_risk_score }}", str(global_risk_score))
 
-    # Insertar filas en la tabla donde está el comentario
     marker = "<!-- Aquí iteras en tu script e insertas filas -->"
     if marker in html:
         html = html.replace(marker, table_rows_html)
     else:
         html = html.replace("</table>", table_rows_html + "\n  </table>")
-
     return html
  
 # -------- main --------

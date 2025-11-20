@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -71,7 +72,8 @@ def _slugify_domain(domain: str) -> str:
 
 # ---------- Your Python logic ----------
 
-def run_python_logic(domain: str) -> DomainResponse:
+
+async def run_python_logic(domain: str) -> DomainResponse:
     is_likely_valid = "." in domain and " " not in domain
 
     if not is_likely_valid:
@@ -82,23 +84,31 @@ def run_python_logic(domain: str) -> DomainResponse:
             report_url=None,
         )
 
-    # 1) Generate HTML content using another method/file
-    tablas, score_cluster = generar_informe_score(domain)
+    # 1) Llamada async (tu función ya es async)
+    tablas = await generar_informe_score(domain)
 
-    #recommend_div = generar_recomendaciones_html(RecomendacionesParams(domain=domain, score=score))
+    # Armamos el HTML final
+    html_content = build_domain_report_html(
+        domain,
+        tablas,
+        111,
+        "RECOMENDACIONES_DIV_AQUI"
+    )
 
-    html_content = build_domain_report_html(domain, tablas, 111, "RECOMENDACIONES_DIV_AQUI")
-
-    # 2) Build a unique filename
+    # 2) Filename único
     slug = _slugify_domain(domain)
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     filename = f"{slug}_{timestamp}.html"
-
-    # 3) Write file to web/reports/<filename>
     file_path = REPORTS_DIR / filename
-    file_path.write_text(html_content, encoding="utf-8")
 
-    # 4) Public URL (because /web is mounted on WEB_DIR)
+    # 3) Escritura async del archivo (sin bloquear)
+    await asyncio.to_thread(
+        file_path.write_text,
+        html_content,
+        "utf-8"
+    )
+
+    # 4) URL pública
     report_url = f"/web/reports/{filename}"
 
     return DomainResponse(
@@ -115,7 +125,7 @@ async def query_domain(payload: DomainRequest):
     """
     Endpoint called from the frontend.
     """
-    result = run_python_logic(payload.domain)
+    result = await run_python_logic(payload.domain)
     print(result)
     return result
 

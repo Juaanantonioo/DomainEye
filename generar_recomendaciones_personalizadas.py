@@ -141,6 +141,7 @@ def generar_recomendaciones_html(params: RecomendacionesParams) -> str:
     html_generales = "".join(f"<li>{item}</li>" for item in generales)
     html_especificas = "".join(f"<li>{item}</li>" for item in especificas)
 
+
     # Construcción final del HTML
     html = f"""
     <div class="recomendaciones">

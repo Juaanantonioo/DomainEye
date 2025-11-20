@@ -6,7 +6,8 @@ import dnstwist_domain_generator as dns_dg
 
 COMMON_TLDS = [".com", ".net", ".org", ".io", ".shop", ".online"]
 
-def generate_registered_candidates(base_domain: str):
+
+async def generate_registered_candidates(base_domain: str):
     name, _, tld = base_domain.partition(".")
     candidates = set()
 
@@ -14,23 +15,36 @@ def generate_registered_candidates(base_domain: str):
     for new_tld in COMMON_TLDS:
         candidates.add(name + new_tld)
 
-    # 2. Typos básicos (sufijos típicos de phishing)
+    # 2. Typos básicos
     suffixes = ["-login", "-secure", "-verify", "-support", "-update", "-payment"]
     for s in suffixes:
         candidates.add(name + s + "." + tld)
 
-    # Evitar el original
     candidates.discard(base_domain)
-    for candidate in candidates.copy():
-        if not asyncio.run(dns_dg.async_is_registered(aiodns.DNSResolver, candidate)):
+
+    # Create resolver once
+    resolver = aiodns.DNSResolver()
+
+    # Run all DNS checks concurrently
+    checks = {
+        candidate: dns_dg.async_is_registered(resolver, candidate)
+        for candidate in list(candidates)
+    }
+
+    results = await asyncio.gather(*checks.values())
+
+    # Filter using results
+    for candidate, is_registered in zip(checks.keys(), results):
+        if not is_registered:
             candidates.discard(candidate)
 
-    for candidate in dns_dg.get_similar_registered_domains_sync_wrapper(base_domain):
+    # Add similar registered domains (sync wrapper)
+    similar = await dns_dg.get_similar_registered_domains(base_domain);
+    for candidate in similar:
         candidates.add(candidate)
 
-    if len(candidates) <= 5:
-        return sorted(candidates)
-    return sorted(list(candidates)[0:5])
+    # Limit to 5 if too big
+    return sorted(candidates)[:5]
 
 def generate_all_candidates(base_domain: str):
     name, _, tld = base_domain.partition(".")

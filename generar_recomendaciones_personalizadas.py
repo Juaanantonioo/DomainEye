@@ -50,23 +50,22 @@ def generar_recomendaciones(dominio_propio: str, dominio_externo: str,
         f"debe poder ser parseable por python ast, asi que no especifiques nada de markdown tampoco"
     )
 
-    
-    lista_str = call_google_llm(prompt)
-    print(prompt)
+
+    lista_str = ""
     lista_parsed = []
 
     while True:
         try:
-            lista_parsed = parse_list(lista_str)
+            lista_str = call_google_llm(prompt)
         except:
-            print("Exception occured")
-            lista_parsed = []
+            print("Exception occured on parse list")
+
+        lista_parsed = parse_list(lista_str)
 
         if len(lista_parsed) == num_frases:
             break
         print("La salida del LLM fue invalida: ", lista_str)
-
-        lista_str = call_google_llm(prompt)
+        
 
     return lista_parsed
 

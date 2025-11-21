@@ -93,7 +93,7 @@ async def run_python_logic(domain: str) -> DomainResponse:
     html_content = build_domain_report_html(
         domain,
         tablas,
-        111,
+        rec_params.score_medio,
         recomendaciones
     )
 

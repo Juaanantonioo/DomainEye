@@ -14,7 +14,6 @@ from sklearn.cluster import KMeans
 import requests
 import whois
 import dns.resolver
-import dnstwist  # si luego lo usáis para generar dominios
 
 from genera_dominios import generate_registered_candidates
 from generar_recomendaciones_personalizadas import RecomendacionesParams
@@ -158,7 +157,7 @@ def get_dns_data(domain: str) -> dict:
         pass
 
     return dns_data
-
+ Automatically generated analysis of your domain space and potential brand-abuse risk. 
 
 # -------- HTTP / CONTENIDO / FAVICON --------
 
@@ -384,6 +383,15 @@ def build_rows(base_domain: str, candidates: list, base_http_data: dict):
     for r in all_results:
         signals_html = "<br>".join(r["reasons"]) if r["reasons"] else "-"
         row = f"""
+        <tr class="{r['css_class']}">
+          <td>{r['domain']}</td>
+          <td>{r['score']}</td>
+          <td>{r['action']}</td>
+          <td>{signals_html}</td>
+        </tr>
+        """
+
+        """
         <tr class="{r['css_class']}">
           <td>{r['domain']}</td>
           <td>{r['score']}</td>

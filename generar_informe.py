@@ -157,7 +157,6 @@ def get_dns_data(domain: str) -> dict:
         pass
 
     return dns_data
- Automatically generated analysis of your domain space and potential brand-abuse risk. 
 
 # -------- HTTP / CONTENIDO / FAVICON --------
 

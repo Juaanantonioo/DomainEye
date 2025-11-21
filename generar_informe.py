@@ -314,11 +314,26 @@ def normalize_brand_domain(hostname: Optional[str]) -> Optional[str]:
     return host
 
 
+def score_to_color(score: float) -> str:
+    """
+    Devuelve un color HSL (string) tipo semáforo en función del score [0,100]:
+    0   -> verde
+    50  -> ámbar
+    100 -> rojo
+    """
+    # Normalizamos 0..100 -> 0..1
+    norm = max(0.0, min(100.0, score)) / 100.0
+    # 120 (verde) -> 0 (rojo)
+    hue = 120 * (1.0 - norm)
+    return f"hsl({hue:.0f}, 80%, 50%)"
+
+
 def build_rows(base_domain: str, candidates: list, base_http_data: dict):
     """
     Construye las filas HTML y devuelve:
       - ordered_rows_html: filas <tr> ordenadas por score (desc)
       - all_scores: lista de scores numéricos para calcular riesgo global
+      - all_results: lista de dicts con info detallada por dominio
     """
     all_results = []
     all_scores = []
@@ -381,19 +396,50 @@ def build_rows(base_domain: str, candidates: list, base_http_data: dict):
     ordered_rows_html = ""
     for r in all_results:
         signals_html = "<br>".join(r["reasons"]) if r["reasons"] else "-"
+
+        # Color del círculo según el score
+        color = score_to_color(r["score"])
+        # Redondeamos el valor mostrado (puedes usar f"{r['score']:.1f}" si quieres decimales)
+        score_label = f"{r['score']:.0f}"
+
+        # Celda de score con círculo
+        score_cell_html = f"""
+          <td>
+            <span
+              class="score-badge"
+              style="
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 2.2rem;
+                height: 2.2rem;
+                border-radius: 999px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                background: {color};
+                color: #0b1721;
+                box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+              "
+            >
+              {score_label}
+            </span>
+          </td>
+        """
+
         row = f"""
         <tr class="{r['css_class']}">
           <td>{r['domain']}</td>
-          <td>{r['score']}</td>
+          {score_cell_html}
           <td>{r['action']}</td>
           <td>{signals_html}</td>
         </tr>
         """
 
         """
+        # Versión extendida si quieres más columnas:
         <tr class="{r['css_class']}">
           <td>{r['domain']}</td>
-          <td>{r['score']}</td>
+          {score_cell_html}
           <td>{r['ip']}</td>
           <td>{r['creation_date']}</td>
           <td>{r['country']}</td>
@@ -404,7 +450,6 @@ def build_rows(base_domain: str, candidates: list, base_http_data: dict):
         ordered_rows_html += row
 
     return ordered_rows_html, all_scores, all_results
-
 
 from collections import Counter
 from datetime import datetime

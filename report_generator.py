@@ -34,6 +34,21 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
+    .btn-report {
+            background: #d9534f; /* rojo suave de alerta */
+            color: white;
+            padding: 12px 20px;
+            margin: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition:
+            background 0.2s ease,
+            transform 0.1s ease;
+      }
     :root {
       --bg-gradient-start: #a8ff78; /* lime-ish */
       --bg-gradient-end: #78ffd6;   /* light blue/teal */
@@ -278,6 +293,9 @@ def build_domain_report_html(domain: str, tables_html: str, score: float, recomm
             __TABLES__
           </div>
         </section>
+
+        <button class="btn-report">Denunciar dominios críticos</button>
+
       </div>
     </section>
   </main>
